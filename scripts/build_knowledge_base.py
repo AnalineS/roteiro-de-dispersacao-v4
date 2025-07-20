@@ -175,12 +175,12 @@ def main():
     
     logger.info(f"Total de chunks criados: {len(all_chunks)}")
     
-    # Constrói índice RAG
-    logger.info("Construindo índice FAISS...")
+    # Constrói índice RAG no Astra DB
+    logger.info("Construindo índice no Astra DB...")
     rag_service = RAGService()
     
     if rag_service.build_index(all_chunks):
-        logger.info("✅ Base de conhecimento construída com sucesso!")
+        logger.info("✅ Base de conhecimento construída com sucesso no Astra DB!")
         
         # Mostra estatísticas
         stats = rag_service.get_stats()
@@ -188,7 +188,7 @@ def main():
         
         return True
     else:
-        logger.error("❌ Erro ao construir base de conhecimento")
+        logger.error("❌ Erro ao construir base de conhecimento no Astra DB")
         return False
 
 if __name__ == "__main__":

@@ -1,0 +1,17 @@
+# Dependências essenciais para o projeto
+flask==2.3.3
+flask-cors==4.0.0
+streamlit==1.28.1
+openai==1.3.5
+sentence-transformers==2.2.2
+python-dotenv==1.0.0
+requests==2.31.0
+pypdf2==3.0.1
+pandas==2.1.3
+numpy==1.24.3
+gunicorn==21.2.0
+
+# Astra DB
+cassio==0.1.3
+astrapy==0.7.0
+

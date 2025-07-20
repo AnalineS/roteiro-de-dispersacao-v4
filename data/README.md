@@ -25,14 +25,16 @@ Este script irá:
 1. Ler todos os arquivos PDF e Markdown desta pasta
 2. Dividir o conteúdo em chunks menores
 3. Gerar embeddings usando Sentence Transformers
-4. Criar um índice FAISS para busca semântica
-5. Salvar o índice para uso pelo chatbot
+4. Armazenar no Astra DB para busca semântica
+5. Configurar a coleção para uso pelo chatbot
 
 ## Arquivos Gerados
 
-Após o processamento, serão criados:
-- `faiss_index.bin` - Índice FAISS para busca vetorial
-- `documents.pkl` - Chunks de texto processados
+Após o processamento, os dados serão armazenados no **Astra DB**:
+- Coleção: `knowledge_base`
+- Keyspace: `roteiro_dispersacao_bot`
+- Embeddings: 384 dimensões (all-MiniLM-L6-v2)
+- Métrica: cosine similarity
 
 ## Estrutura Esperada da Tese
 
@@ -74,8 +76,7 @@ cp ~/Downloads/tese_doutorado.pdf ./data/
 # 2. Execute o processamento
 python scripts/build_knowledge_base.py
 
-# 3. Verifique se os arquivos foram criados
-ls -la data/
-# Deve mostrar: faiss_index.bin e documents.pkl
+# 3. Verifique se os dados foram armazenados no Astra DB
+# O script mostrará estatísticas da coleção criada
 ```
 

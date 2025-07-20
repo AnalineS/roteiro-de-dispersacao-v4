@@ -1,130 +1,149 @@
 """
-Serviço RAG (Retrieval-Augmented Generation) para recuperação de contexto
+Serviço RAG (Retrieval-Augmented Generation) para recuperação de contexto usando Astra DB
 """
 
 import os
 import logging
-import pickle
-from typing import List, Optional
+import json
+from typing import List, Optional, Dict, Any
 import numpy as np
 from sentence_transformers import SentenceTransformer
-import faiss
 
 logger = logging.getLogger(__name__)
 
 class RAGService:
-    """Serviço de recuperação de informações da base de conhecimento"""
+    """Serviço de recuperação de informações da base de conhecimento usando Astra DB"""
     
     def __init__(self):
         self.embedding_model_name = "sentence-transformers/all-MiniLM-L6-v2"
         self.embedding_model = None
-        self.faiss_index = None
-        self.documents = []
+        self.astra_client = None
+        self.collection = None
         self.is_initialized = False
         
-        # Caminhos dos arquivos
-        self.data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
-        self.index_path = os.path.join(self.data_dir, 'faiss_index.bin')
-        self.docs_path = os.path.join(self.data_dir, 'documents.pkl')
+        # Configurações Astra DB
+        self.astra_db_token = os.getenv('ASTRA_DB_TOKEN')
+        self.astra_db_endpoint = os.getenv('ASTRA_DB_ENDPOINT')
+        self.astra_db_keyspace = os.getenv('ASTRA_DB_KEYSPACE', 'roteiro_dispersacao_bot')
+        self.collection_name = "knowledge_base"
         
         # Inicializa o serviço
         self._initialize()
     
     def _initialize(self):
-        """Inicializa o modelo de embeddings e carrega índice se existir"""
+        """Inicializa o modelo de embeddings e conecta ao Astra DB"""
         try:
-            logger.info("Inicializando RAG Service...")
+            logger.info("Inicializando RAG Service com Astra DB...")
             
             # Carrega modelo de embeddings
             self.embedding_model = SentenceTransformer(self.embedding_model_name)
             logger.info(f"Modelo de embeddings carregado: {self.embedding_model_name}")
             
-            # Tenta carregar índice existente
-            if self._load_existing_index():
-                logger.info("Índice FAISS carregado com sucesso")
+            # Conecta ao Astra DB
+            if self._connect_astra_db():
+                logger.info("Conexão com Astra DB estabelecida")
                 self.is_initialized = True
             else:
-                logger.warning("Nenhum índice encontrado. Execute build_index() primeiro.")
+                logger.warning("Falha na conexão com Astra DB")
                 
         except Exception as e:
             logger.error(f"Erro ao inicializar RAG Service: {str(e)}")
     
-    def _load_existing_index(self) -> bool:
-        """Carrega índice FAISS e documentos existentes"""
+    def _connect_astra_db(self) -> bool:
+        """Conecta ao Astra DB"""
         try:
-            if os.path.exists(self.index_path) and os.path.exists(self.docs_path):
-                # Carrega índice FAISS
-                self.faiss_index = faiss.read_index(self.index_path)
-                
-                # Carrega documentos
-                with open(self.docs_path, 'rb') as f:
-                    self.documents = pickle.load(f)
-                
-                logger.info(f"Carregados {len(self.documents)} documentos")
-                return True
+            if not all([self.astra_db_token, self.astra_db_endpoint]):
+                logger.error("Credenciais do Astra DB não configuradas")
+                return False
             
-            return False
+            # Importa bibliotecas do Astra DB
+            try:
+                from astrapy.db import AstraDB
+                from astrapy.collection import AstraDBCollection
+            except ImportError:
+                logger.error("Bibliotecas do Astra DB não instaladas (astrapy)")
+                return False
+            
+            # Inicializa cliente Astra DB
+            self.astra_client = AstraDB(
+                token=self.astra_db_token,
+                api_endpoint=self.astra_db_endpoint,
+                namespace=self.astra_db_keyspace
+            )
+            
+            # Cria ou obtém a coleção
+            try:
+                # Tenta criar a coleção (se não existir)
+                self.collection = self.astra_client.create_collection(
+                    collection_name=self.collection_name,
+                    dimension=384,  # Dimensão do modelo all-MiniLM-L6-v2
+                    metric="cosine"
+                )
+                logger.info(f"Coleção '{self.collection_name}' criada")
+            except Exception:
+                # Se já existir, apenas obtém a referência
+                self.collection = AstraDBCollection(
+                    collection_name=self.collection_name,
+                    astra_db=self.astra_client
+                )
+                logger.info(f"Coleção '{self.collection_name}' encontrada")
+            
+            return True
             
         except Exception as e:
-            logger.error(f"Erro ao carregar índice existente: {str(e)}")
+            logger.error(f"Erro ao conectar com Astra DB: {str(e)}")
             return False
     
     def build_index(self, documents: List[str]) -> bool:
         """
-        Constrói o índice FAISS a partir de uma lista de documentos
+        Constrói o índice no Astra DB a partir de uma lista de documentos
         
         Args:
             documents: Lista de strings (chunks da tese)
         """
         try:
-            logger.info(f"Construindo índice para {len(documents)} documentos...")
+            logger.info(f"Construindo índice no Astra DB para {len(documents)} documentos...")
             
-            if not self.embedding_model:
-                raise Exception("Modelo de embeddings não inicializado")
+            if not self.is_ready():
+                raise Exception("Serviço RAG não inicializado corretamente")
             
             # Gera embeddings para todos os documentos
+            logger.info("Gerando embeddings...")
             embeddings = self.embedding_model.encode(documents, show_progress_bar=True)
             
-            # Cria índice FAISS
-            dimension = embeddings.shape[1]
-            self.faiss_index = faiss.IndexFlatIP(dimension)  # Inner Product (cosine similarity)
+            # Prepara documentos para inserção no Astra DB
+            documents_to_insert = []
+            for i, (doc, embedding) in enumerate(zip(documents, embeddings)):
+                doc_data = {
+                    "_id": f"doc_{i}",
+                    "content": doc,
+                    "$vector": embedding.tolist(),
+                    "metadata": {
+                        "chunk_id": i,
+                        "length": len(doc),
+                        "source": "tese_doutorado"
+                    }
+                }
+                documents_to_insert.append(doc_data)
             
-            # Normaliza embeddings para usar cosine similarity
-            faiss.normalize_L2(embeddings)
+            # Insere documentos no Astra DB em lotes
+            batch_size = 20  # Astra DB recomenda lotes pequenos
+            for i in range(0, len(documents_to_insert), batch_size):
+                batch = documents_to_insert[i:i + batch_size]
+                
+                try:
+                    result = self.collection.insert_many(batch)
+                    logger.info(f"Lote {i//batch_size + 1} inserido: {len(batch)} documentos")
+                except Exception as e:
+                    logger.error(f"Erro ao inserir lote {i//batch_size + 1}: {str(e)}")
+                    # Continua com próximo lote
             
-            # Adiciona embeddings ao índice
-            self.faiss_index.add(embeddings.astype('float32'))
-            
-            # Salva documentos
-            self.documents = documents
-            
-            # Persiste índice e documentos
-            self._save_index()
-            
-            self.is_initialized = True
-            logger.info("Índice FAISS construído e salvo com sucesso")
+            logger.info("Índice Astra DB construído com sucesso")
             return True
             
         except Exception as e:
             logger.error(f"Erro ao construir índice: {str(e)}")
             return False
-    
-    def _save_index(self):
-        """Salva índice FAISS e documentos no disco"""
-        try:
-            # Cria diretório se não existir
-            os.makedirs(self.data_dir, exist_ok=True)
-            
-            # Salva índice FAISS
-            faiss.write_index(self.faiss_index, self.index_path)
-            
-            # Salva documentos
-            with open(self.docs_path, 'wb') as f:
-                pickle.dump(self.documents, f)
-                
-        except Exception as e:
-            logger.error(f"Erro ao salvar índice: {str(e)}")
-            raise
     
     def retrieve_context(self, query: str, top_k: int = 3) -> str:
         """
@@ -142,19 +161,21 @@ class RAGService:
                 return "Base de conhecimento não disponível no momento."
             
             # Gera embedding da consulta
-            query_embedding = self.embedding_model.encode([query])
-            faiss.normalize_L2(query_embedding)
+            query_embedding = self.embedding_model.encode([query])[0]
             
-            # Busca documentos similares
-            scores, indices = self.faiss_index.search(
-                query_embedding.astype('float32'), top_k
+            # Busca documentos similares no Astra DB
+            results = self.collection.vector_find(
+                vector=query_embedding.tolist(),
+                limit=top_k,
+                fields=["content", "metadata"]
             )
             
-            # Recupera documentos relevantes
+            # Extrai documentos relevantes
             relevant_docs = []
-            for i, (score, idx) in enumerate(zip(scores[0], indices[0])):
-                if idx < len(self.documents) and score > 0.1:  # Threshold mínimo
-                    relevant_docs.append(self.documents[idx])
+            for result in results:
+                content = result.get("content", "")
+                if content.strip():
+                    relevant_docs.append(content)
             
             if not relevant_docs:
                 return "Não encontrei informações específicas sobre sua pergunta na base de conhecimento."
@@ -162,7 +183,7 @@ class RAGService:
             # Concatena contexto
             context = "\n\n".join(relevant_docs)
             
-            logger.info(f"Recuperados {len(relevant_docs)} documentos relevantes")
+            logger.info(f"Recuperados {len(relevant_docs)} documentos relevantes do Astra DB")
             return context
             
         except Exception as e:
@@ -173,19 +194,52 @@ class RAGService:
         """Verifica se o serviço está pronto para uso"""
         return (self.is_initialized and 
                 self.embedding_model is not None and 
-                self.faiss_index is not None and 
-                len(self.documents) > 0)
+                self.astra_client is not None and
+                self.collection is not None)
     
     def get_stats(self) -> dict:
         """Retorna estatísticas do índice"""
         if not self.is_ready():
             return {"status": "not_ready"}
         
-        return {
-            "status": "ready",
-            "total_documents": len(self.documents),
-            "index_size": self.faiss_index.ntotal,
-            "embedding_dimension": self.faiss_index.d,
-            "model_name": self.embedding_model_name
-        }
+        try:
+            # Tenta obter estatísticas da coleção
+            stats = self.collection.find_one({}, projection={"_id": 1})
+            
+            return {
+                "status": "ready",
+                "database": "Astra DB",
+                "collection": self.collection_name,
+                "keyspace": self.astra_db_keyspace,
+                "embedding_model": self.embedding_model_name,
+                "embedding_dimension": 384,
+                "connected": True
+            }
+        except Exception as e:
+            logger.error(f"Erro ao obter estatísticas: {str(e)}")
+            return {
+                "status": "ready",
+                "database": "Astra DB",
+                "collection": self.collection_name,
+                "keyspace": self.astra_db_keyspace,
+                "embedding_model": self.embedding_model_name,
+                "embedding_dimension": 384,
+                "connected": False,
+                "error": str(e)
+            }
+    
+    def clear_collection(self) -> bool:
+        """Limpa todos os documentos da coleção"""
+        try:
+            if not self.is_ready():
+                return False
+            
+            # Remove todos os documentos
+            result = self.collection.delete_many({})
+            logger.info("Coleção limpa com sucesso")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Erro ao limpar coleção: {str(e)}")
+            return False
 
