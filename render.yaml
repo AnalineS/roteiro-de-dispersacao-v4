@@ -3,7 +3,7 @@ services:
     name: roteiro-dispersacao-backend
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements_light.txt
     startCommand: gunicorn --bind 0.0.0.0:$PORT backend.app:app
     envVars:
       - key: PYTHON_VERSION
@@ -30,8 +30,8 @@ services:
     name: roteiro-dispersacao-frontend
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run frontend/chatbot.py --server.port $PORT --server.address 0.0.0.0
+    buildCommand: pip install -r requirements_light.txt
+    startCommand: streamlit run streamlit_app_friendly.py --server.port $PORT --server.address 0.0.0.0
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -41,4 +41,12 @@ services:
         value: true
       - key: STREAMLIT_BROWSER_GATHER_USAGE_STATS
         value: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: ASTRA_DB_TOKEN
+        sync: false
+      - key: ASTRA_DB_ENDPOINT
+        sync: false
+      - key: ASTRA_DB_KEYSPACE
+        value: roteiro_dispersacao_bot
 
