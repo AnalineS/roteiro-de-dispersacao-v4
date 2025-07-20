@@ -1,0 +1,36 @@
+# Core dependencies
+streamlit==1.28.1
+flask==2.3.3
+langchain==0.0.335
+langflow==0.6.7
+faiss-cpu==1.7.4
+openai==1.3.5
+
+# Database
+cassandra-driver==3.28.0
+astrapy==0.7.0
+
+# Data processing
+pandas==2.1.3
+numpy==1.24.3
+sentence-transformers==2.2.2
+
+# Environment and configuration
+python-dotenv==1.0.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# API and HTTP
+requests==2.31.0
+httpx==0.25.2
+
+# Utilities
+python-multipart==0.0.6
+uvicorn==0.24.0
+gunicorn==21.2.0
+
+# Development
+pytest==7.4.3
+black==23.11.0
+flake8==6.1.0
+

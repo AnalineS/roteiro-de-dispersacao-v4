@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  streamlit-app:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - ASTRA_DB_TOKEN=${ASTRA_DB_TOKEN}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - LANGFLOW_API_KEY=${LANGFLOW_API_KEY}
+      - DEBUG=True
+    volumes:
+      - .:/app
+    command: python app/main.py --mode streamlit
+    
+  flask-api:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - ASTRA_DB_TOKEN=${ASTRA_DB_TOKEN}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - LANGFLOW_API_KEY=${LANGFLOW_API_KEY}
+      - DEBUG=True
+    volumes:
+      - .:/app
+    command: python app/main.py --mode flask
+

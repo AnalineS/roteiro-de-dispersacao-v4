@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: roteiro-dispersacao-v4
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app/main.py --mode streamlit
+    envVars:
+      - key: ASTRA_DB_TOKEN
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: LANGFLOW_API_KEY
+        sync: false
+      - key: DEBUG
+        value: "False"
+      - key: STREAMLIT_PORT
+        value: "10000"
+      - key: STREAMLIT_HOST
+        value: "0.0.0.0"
+    healthCheckPath: /
+    
+  - type: web
+    name: roteiro-dispersacao-v4-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app/main.py --mode flask
+    envVars:
+      - key: ASTRA_DB_TOKEN
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: LANGFLOW_API_KEY
+        sync: false
+      - key: DEBUG
+        value: "False"
+      - key: FLASK_PORT
+        value: "10000"
+      - key: FLASK_HOST
+        value: "0.0.0.0"
+    healthCheckPath: /api/health
+
