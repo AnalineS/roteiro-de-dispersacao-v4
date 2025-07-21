@@ -7,7 +7,7 @@ import logging
 from typing import Optional, Dict, Any
 from openai import OpenAI
 from personas import PersonaManager
-from rag_service import RAGService
+from rag_service_openai import RAGService
 
 logger = logging.getLogger(__name__)
 

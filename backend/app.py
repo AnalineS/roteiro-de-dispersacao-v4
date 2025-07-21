@@ -25,6 +25,10 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
 app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
 
 # Importa módulos do projeto
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from chatbot import ChatbotService
 from personas import PersonaManager
 
