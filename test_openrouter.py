@@ -4,8 +4,6 @@ Teste da integração com OpenRouter e Kimie K2
 """
 
 import os
-import sys
-import json
 from pathlib import Path
 
 # Carrega variáveis de ambiente
@@ -157,14 +155,13 @@ def main():
     # Verifica se requests está disponível
     requests_available = True
     try:
-        import requests
+        pass
     except ImportError:
         requests_available = False
         print("📦 Tentando instalar biblioteca 'requests'...")
         os.system("pip install requests")
         
         try:
-            import requests
             requests_available = True
             print("✅ Biblioteca 'requests' instalada com sucesso!")
         except ImportError:

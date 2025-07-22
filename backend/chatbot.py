@@ -4,7 +4,6 @@ Módulo principal do chatbot com integração RAG e OpenRouter
 
 import os
 import logging
-from typing import Optional, Dict, Any
 from openai import OpenAI
 from personas import PersonaManager
 from rag_service_openai import RAGService

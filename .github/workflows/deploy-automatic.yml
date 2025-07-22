@@ -1,0 +1,266 @@
+name: Deploy Automático - Render (Backend + Frontend)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Test application
+      run: |
+        python -c "import app_optimized; print('✅ App import successful')"
+        python -c "import flask; print('✅ Flask import successful')"
+        python -c "import transformers; print('✅ Transformers import successful')"
+        echo "✅ Todos os testes passaram!"
+
+  deploy-backend:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Create deployment package for Render
+      run: |
+        echo "📦 Criando pacote de deploy para Render..."
+        mkdir -p deploy_package
+        
+        # Copiar arquivos principais
+        cp app_optimized.py deploy_package/app.py
+        cp requirements.txt deploy_package/
+        cp runtime.txt deploy_package/
+        cp gunicorn.conf.py deploy_package/
+        cp render.yaml deploy_package/
+        
+        # Copiar pastas necessárias
+        cp -r templates deploy_package/
+        cp -r static deploy_package/
+        cp -r PDFs deploy_package/
+        cp -r functions deploy_package/
+        
+        echo "✅ Pacote criado com sucesso!"
+        
+    - name: Create ZIP file for Render
+      run: |
+        cd deploy_package
+        zip -r ../deploy_render.zip .
+        echo "📦 Arquivo ZIP criado: deploy_render.zip"
+        ls -la ../deploy_render.zip
+        
+    - name: Deploy to Render via API
+      if: env.RENDER_API_KEY != ''
+      run: |
+        echo "🚀 Iniciando deploy para Render..."
+        
+        # Instalar jq para parsing JSON
+        which jq || apt-get update && apt-get install -y jq
+        
+        # Verificar se temos o SERVICE_ID
+        if [ -z "${{ secrets.RENDER_SERVICE_ID }}" ]; then
+          echo "❌ RENDER_SERVICE_ID não configurado!"
+          echo "📋 Para configurar:"
+          echo "1. Vá para https://dashboard.render.com"
+          echo "2. Selecione seu serviço"
+          echo "3. Copie o ID do serviço da URL"
+          echo "4. Adicione como secret RENDER_SERVICE_ID no GitHub"
+          exit 1
+        fi
+        
+        # Criar novo deploy
+        echo "🔄 Criando novo deploy..."
+        DEPLOY_RESPONSE=$(curl -s -X POST \
+          -H "Authorization: Bearer $RENDER_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "clearCache": "do_not_clear"
+          }' \
+          "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys")
+        
+        if echo "$DEPLOY_RESPONSE" | jq -e '.id' > /dev/null; then
+          DEPLOY_ID=$(echo "$DEPLOY_RESPONSE" | jq -r '.id')
+          echo "✅ Deploy iniciado com ID: $DEPLOY_ID"
+          
+          # Aguardar conclusão do deploy
+          echo "⏳ Aguardando conclusão do deploy..."
+          for i in {1..30}; do
+            STATUS_RESPONSE=$(curl -s -H "Authorization: Bearer $RENDER_API_KEY" \
+              "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/$DEPLOY_ID")
+            
+            STATUS=$(echo "$STATUS_RESPONSE" | jq -r '.status')
+            echo "Status atual: $STATUS"
+            
+            if [ "$STATUS" = "live" ]; then
+              echo "🎉 Deploy concluído com sucesso!"
+              echo "🌐 URL: https://${{ secrets.RENDER_SERVICE_NAME }}.onrender.com"
+              break
+            elif [ "$STATUS" = "failed" ]; then
+              echo "❌ Deploy falhou!"
+              echo "Logs do erro:"
+              echo "$STATUS_RESPONSE" | jq -r '.error' || echo "Erro desconhecido"
+              exit 1
+            fi
+            
+            sleep 30
+          done
+        else
+          echo "❌ Erro ao iniciar deploy:"
+          echo "$DEPLOY_RESPONSE"
+          exit 1
+        fi
+        
+    - name: Upload deployment package as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: render-deployment-package
+        path: deploy_render.zip
+        retention-days: 7
+
+  deploy-frontend:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Create frontend package for Render
+      run: |
+        echo "📦 Criando pacote frontend para Render..."
+        mkdir -p deploy_frontend_package
+        
+        # Copiar arquivos estáticos
+        cp -r static deploy_frontend_package/
+        cp -r templates deploy_frontend_package/
+        cp -r PDFs deploy_frontend_package/
+        
+        # Criar app.py para frontend (servidor estático)
+        cat > deploy_frontend_package/app.py << 'EOF'
+        from flask import Flask, send_from_directory, render_template
+        import os
+
+        app = Flask(__name__)
+
+        @app.route('/')
+        def index():
+            return render_template('index.html')
+
+        @app.route('/tese')
+        def tese():
+            return render_template('tese.html')
+
+        @app.route('/static/<path:filename>')
+        def static_files(filename):
+            return send_from_directory('static', filename)
+
+        @app.route('/health')
+        def health():
+            return {'status': 'healthy', 'service': 'frontend'}
+
+        if __name__ == '__main__':
+            app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+        EOF
+        
+        # Criar requirements.txt para frontend
+        cat > deploy_frontend_package/requirements.txt << 'EOF'
+        flask==3.0.0
+        gunicorn==21.2.0
+        EOF
+        
+        # Criar runtime.txt
+        echo "3.11.0" > deploy_frontend_package/runtime.txt
+        
+        # Criar gunicorn.conf.py
+        cat > deploy_frontend_package/gunicorn.conf.py << 'EOF'
+        import os
+        bind = f"0.0.0.0:{os.environ.get('PORT', 8080)}"
+        workers = 2
+        timeout = 120
+        EOF
+        
+        # Criar render.yaml para frontend
+        cat > deploy_frontend_package/render.yaml << 'EOF'
+        services:
+          - type: web
+            name: roteiro-dispersacao-frontend
+            env: python
+            plan: free
+            buildCommand: pip install -r requirements.txt
+            startCommand: gunicorn app:app
+            envVars:
+              - key: PYTHON_VERSION
+                value: 3.11.4
+        EOF
+        
+        echo "✅ Pacote frontend criado com sucesso!"
+        
+    - name: Create frontend ZIP file
+      run: |
+        cd deploy_frontend_package
+        zip -r ../deploy_frontend.zip .
+        echo "📦 Arquivo ZIP frontend criado: deploy_frontend.zip"
+        
+    - name: Upload frontend package as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-deployment-package
+        path: deploy_frontend.zip
+        retention-days: 7
+
+  notify:
+    needs: [deploy-backend, deploy-frontend]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notify deployment status
+      run: |
+        echo "📊 Status do Deploy Automático - Render:"
+        echo "Backend: ${{ needs.deploy-backend.result }}"
+        echo "Frontend: ${{ needs.deploy-frontend.result }}"
+        
+        if [ "${{ needs.deploy-backend.result }}" = "success" ] && [ "${{ needs.deploy-frontend.result }}" = "success" ]; then
+          echo "🎉 Deploy completo realizado com sucesso!"
+          echo "🌐 Backend: https://${{ secrets.RENDER_SERVICE_NAME }}.onrender.com"
+          echo "🌐 Frontend: https://${{ secrets.RENDER_FRONTEND_SERVICE_NAME }}.onrender.com"
+        else
+          echo "⚠️ Alguns deploys podem ter falhado. Verifique os logs acima."
+        fi
+        
+        echo ""
+        echo "📋 Próximos passos:"
+        echo "1. Verifique se os serviços estão rodando no Render"
+        echo "2. Teste as URLs dos serviços"
+        echo "3. Configure domínios customizados se necessário"
+        echo "4. Monitore os logs para identificar problemas" 

@@ -5,9 +5,7 @@ Versão otimizada que usa OpenAI embeddings em vez de SentenceTransformers
 
 import os
 import logging
-import json
-from typing import List, Optional, Dict, Any
-import numpy as np
+from typing import List, Dict, Any
 import openai
 
 logger = logging.getLogger(__name__)
@@ -146,7 +144,7 @@ class RAGService:
                 docs_to_insert.append(doc_with_embedding)
             
             # Insere no Astra DB
-            result = self.collection.insert_many(docs_to_insert)
+            self.collection.insert_many(docs_to_insert)
             logger.info(f"Inseridos {len(docs_to_insert)} documentos")
             
             return True

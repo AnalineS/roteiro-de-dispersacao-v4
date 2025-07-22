@@ -1,0 +1,70 @@
+{
+  "data": {
+    "nodes": [
+      {
+        "id": "File-1",
+        "type": "File",
+        "data": {
+          "path": ["PDFs/Roteiro de Dsispensação - Hanseníase.md"]
+        }
+      },
+      {
+        "id": "Splitter-1",
+        "type": "RecursiveCharacterTextSplitter",
+        "data": {
+          "chunk_size": 400,
+          "chunk_overlap": 80
+        }
+      },
+      {
+        "id": "Embeddings-1",
+        "type": "HuggingFaceInferenceAPIEmbeddings",
+        "data": {
+          "model": "sentence-transformers/all-MiniLM-L6-v2"
+        }
+      },
+      {
+        "id": "AstraDB-1",
+        "type": "AstraDB",
+        "data": {
+          "collection": "hanseniase_docs"
+        }
+      },
+      {
+        "id": "PromptTemplate-1",
+        "type": "PromptTemplate",
+        "data": {
+          "template": "Instrução de Sistema: {system_prompt}\n\nUse o seguinte contexto para responder à pergunta. Se a resposta não estiver no contexto, diga que não encontrou a informação no documento fornecido.\n\nContexto: {context}\n\nPergunta: {question}\n\nResposta:"
+        }
+      },
+      {
+        "id": "OpenRouter-1",
+        "type": "OpenRouter",
+        "data": {
+          "model": "google/gemini-2.0-flash-exp:free"
+        }
+      },
+      {
+        "id": "Tracing-1",
+        "type": "Langfuse",
+        "data": {
+          "enabled": true
+        }
+      },
+      {
+        "id": "ChatOutput-1",
+        "type": "ChatOutput",
+        "data": {}
+      }
+    ],
+    "edges": [
+      { "source": "File-1", "target": "Splitter-1" },
+      { "source": "Splitter-1", "target": "Embeddings-1" },
+      { "source": "Embeddings-1", "target": "AstraDB-1" },
+      { "source": "AstraDB-1", "target": "PromptTemplate-1" },
+      { "source": "PromptTemplate-1", "target": "OpenRouter-1" },
+      { "source": "OpenRouter-1", "target": "Tracing-1" },
+      { "source": "Tracing-1", "target": "ChatOutput-1" }
+    ]
+  }
+}

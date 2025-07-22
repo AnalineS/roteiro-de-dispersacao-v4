@@ -6,7 +6,7 @@ Usa OpenAI embeddings em vez de SentenceTransformers para evitar dependência do
 import os
 import logging
 import openai
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from backend.rag_service_openai import RAGService
 
 logger = logging.getLogger(__name__)

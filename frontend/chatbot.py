@@ -5,8 +5,6 @@ Interface Streamlit para o chatbot de Roteiro de Dispensação
 import streamlit as st
 import requests
 import os
-from datetime import datetime
-import json
 
 # Configuração da página
 st.set_page_config(

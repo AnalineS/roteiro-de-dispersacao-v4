@@ -1,0 +1,82 @@
+name: Deploy to Netlify
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Create Netlify configuration
+      run: |
+        cat > netlify.toml << 'EOF'
+        [build]
+          publish = "."
+          command = "bash netlify_build_fix.sh"
+          functions = "functions"
+
+        [[redirects]]
+          from = "/api/*"
+          to = "/.netlify/functions/api/:splat"
+          status = 200
+          force = true
+
+        [[redirects]]
+          from = "/*"
+          to = "/index.html"
+          status = 200
+
+        [build.environment]
+          PYTHON_VERSION = "3.9"
+          NODE_VERSION = "18"
+          ENABLE_SYNONYMS = "true"
+          ENABLE_CONTEXT_EXTRACTION = "true"
+          CONFIDENCE_THRESHOLD = "0.3"
+          MAX_CHUNKS = "3"
+          CHUNK_SIZE = "1500"
+          CHUNK_OVERLAP = "300"
+
+        [functions]
+          directory = "functions"
+          node_bundler = "esbuild"
+          included_files = ["PDFs/**/*"]
+          external_node_modules = ["@netlify/functions"]
+
+        [[headers]]
+          for = "/api/*"
+          [headers.values]
+            Access-Control-Allow-Origin = "*"
+            Access-Control-Allow-Headers = "Content-Type"
+            Access-Control-Allow-Methods = "POST, OPTIONS"
+        EOF
+        
+    - name: Deploy to Netlify
+      uses: nwtgck/actions-netlify@v3.0
+      with:
+        publish-dir: '.'
+        production-branch: main
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "Deploy from GitHub Actions"
+        enable-pull-request-comment: true
+        enable-commit-comment: true
+        overwrites-pull-request-comment: true
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      timeout-minutes: 1 

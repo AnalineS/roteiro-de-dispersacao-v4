@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Tese - Roteiro de Dispensação para Hanseníase</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Explore o conteúdo completo da tese de doutorado sobre a elaboração e validação de um Roteiro de Dispensação para Hanseníase na farmácia clínica.">
+    <meta name="keywords" content="tese, hanseníase, roteiro de dispensação, farmácia clínica, cuidado farmacêutico, PQT-U, clofazimina, reações hansênicas, Nélio Gomes, UnB">
+    <meta name="author" content="Nélio Gomes">
+    <meta name="theme-color" content="#1ABC9C">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="URL_COMPLETA_DA_PAGINA_TESE.html">
+    <meta property="og:title" content="A Tese - Roteiro de Dispensação para Hanseníase">
+    <meta property="og:description" content="Explore o conteúdo detalhado da tese sobre o roteiro de dispensação clínica para hanseníase.">
+    <meta property="og:image" content="https://i.ibb.co/6rC6C8g/tese-web-og-image.jpg">
+    <meta property="article:author" content="Nélio Gomes">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="URL_COMPLETA_DA_PAGINA_TESE.html">
+    <meta name="twitter:title" content="A Tese - Roteiro de Dispensação para Hanseníase">
+    <meta name="twitter:description" content="Explore o conteúdo detalhado da tese sobre o roteiro de dispensação clínica para hanseníase.">
+    <meta name="twitter:image" content="https://i.ibb.co/6rC6C8g/tese-web-og-image.jpg">
+    
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --primary-color: #1ABC9C; --primary-dark: #16a085;
+            --secondary-color: #2C3E50; --secondary-light: #34495E;
+            --text-color: #2C3E50; --bg-light: #ECF0F1; --bg-white: #ffffff;
+            --border-radius: 0.5rem; --transition: all 0.3s ease;
+        }
+        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-light); color: var(--text-color); }
+        .nav-link { color: var(--text-color); transition: var(--transition); position: relative; }
+        .nav-link:hover { color: var(--primary-color); }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 50%; background-color: var(--primary-color); transition: var(--transition); transform: translateX(-50%); }
+        .nav-link:hover::after { width: 100%; }
+        .disease-tab { padding: 0.75rem 1.5rem; cursor: pointer; border-bottom: 3px solid transparent; font-weight: 600; color: var(--secondary-light); transition: var(--transition); }
+        .disease-tab:hover { color: var(--primary-dark); }
+        .disease-tab.active-tab { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        .thesis-sidebar a { display: block; padding: 0.5rem 1rem; border-left: 3px solid transparent; transition: all 0.2s ease; color: var(--secondary-light); font-weight: 500; border-radius: 0 0.25rem 0.25rem 0; }
+        .thesis-sidebar a:hover { color: var(--primary-dark); background-color: #e0e6e8; border-left-color: var(--primary-color); }
+        .thesis-sidebar a.active { color: var(--primary-dark); background-color: rgba(26, 188, 156, 0.1); border-left-color: var(--primary-color); font-weight: 700; }
+        .thesis-content h2 { font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; color: var(--secondary-color); margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary-color); }
+        .thesis-content h3 { font-size: 1.5rem; line-height: 2rem; font-weight: 600; color: var(--secondary-light); margin-top: 2rem; margin-bottom: 1rem; }
+        .thesis-content p, .thesis-content li { font-size: 1.1rem; line-height: 1.75; margin-bottom: 1rem; }
+        .thesis-content section { padding-top: 5rem; margin-top: -4rem; }
+        .card { background-color: var(--bg-white); border-radius: var(--border-radius); padding: 1.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .table th, .table td { border: 1px solid #ddd; padding: 0.75rem; text-align: left; }
+        .table th { background-color: #f2f2f2; font-weight: 600; color: var(--secondary-color); }
+    </style>
+</head>
+<body>
+
+    <header id="header" class="bg-white/80 backdrop-blur-sm sticky top-0 z-40 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="/" class="flex items-center gap-2">
+                <img src="https://i.postimg.cc/RZqnkRJr/UnB.webp" alt="Logo UnB" class="h-10 w-auto">
+                <span class="text-lg font-semibold text-secondary-color hidden sm:inline">Roteiro de Dispensação</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="/#inicio" class="nav-link">Início</a>
+                <a href="/#sobre" class="nav-link">Sobre</a>
+                <a href="/tese" class="nav-link">A Tese</a>
+                <a href="/#chatbot" class="nav-link">Chatbot</a>
+                <a href="/#contato" class="nav-link">Contato</a>
+            </div>
+            <div class="md:hidden">
+                 <a href="/" class="px-4 py-2 bg-primary-color text-white rounded-md">Voltar</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mx-auto px-6 py-8">
+        <div class="mb-8 border-b border-gray-300">
+            <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+                <button id="tab-hansen" class="disease-tab active-tab">Hanseníase</button>
+                <button id="tab-fake" class="disease-tab">Doença Fictícia (Exemplo)</button>
+            </nav>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row gap-8 lg:gap-12">
+            
+            <aside id="sidebar-hansen" class="disease-sidebar md:w-1/4 lg:w-1/5 md:sticky md:top-24 h-full">
+                 <div class="p-4 bg-white rounded-lg shadow-sm">
+                    <h3 class="font-bold text-lg mb-4 text-secondary-color">Guia de Dispensação</h3>
+                    <nav class="thesis-sidebar">
+                        <a href="#pqt-u">PQT-U</a>
+                        <a href="#clofazimina">Clofazimina</a>
+                        <a href="#esquemas-alternativos">Esquemas Alternativos</a>
+                        <a href="#reacoes-hansenicas">Reações Hansênicas</a>
+                        <a href="#referencias">Referências</a>
+                    </nav>
+                 </div>
+            </aside>
+
+            <aside id="sidebar-fake" class="disease-sidebar hidden md:w-1/4 lg:w-1/5 md:sticky md:top-24 h-full">
+                <div class="p-4 bg-white rounded-lg shadow-sm">
+                   <h3 class="font-bold text-lg mb-4 text-secondary-color">Guia Fictício</h3>
+                   <nav class="thesis-sidebar">
+                       <a href="#fake-intro">Introdução</a>
+                       <a href="#fake-tratamento">Tratamento</a>
+                   </nav>
+                </div>
+           </aside>
+            
+            <article class="md:w-3/4 lg:w-4/5 bg-white p-6 lg:p-10 rounded-lg shadow-sm thesis-content">
+                
+                <div id="content-hansen" class="disease-content">
+                    <section id="pqt-u">
+                        <h2>Poliquimioterapia Única (PQT-U)</h2>
+                        <p class="text-sm italic">Informações compiladas por Sâmara Caroline Franco Akkati, Sabrina Oliveira Campos de França, Laura Beatriz Gomes Brandão, Barbara Manuela Cardoso Sodré, Rafael Santos Santana.</p>
+                        
+                        <div class="space-y-6">
+                            <div class="card">
+                                <h3>Apresentações Disponíveis</h3>
+                                <ul class="list-disc list-inside">
+                                    <li><strong>Poliquimioterapia Única Adulto (PQT-U):</strong> Blíster com 6 cápsulas de rifampicina 300mg, 1 comprimido de dapsona 100mg e 3 cápsulas de clofazimina (1 de 100mg e 2 de 50mg).</li>
+                                    <li><strong>Poliquimioterapia Única Infantil (PQT-U):</strong> Blíster com 1 cápsula de rifampicina 150mg, 1 comprimido de dapsona 50mg e 1 cápsula de clofazimina 50mg.</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="card">
+                                <h3>Etapa 1: Avaliação Inicial</h3>
+                                <p><strong>Acesso e Disponibilidade:</strong> Medicamento sem similares ou genéricos disponíveis para venda. É fornecido exclusivamente pelo SUS, integrando o Componente Estratégico da Assistência Farmacêutica. A dispensação ocorre em unidades básicas de saúde e centros de referência. A farmácia deve manter um estoque de segurança e realizar o controle via sistema HÓRUS.</p>
+                                <p><strong>Prescrição:</strong> Deve ser feita em receituário comum em duas vias, com quantidade suficiente para um mês de tratamento, conforme a Portaria SVS/MS nº 344/1998.</p>
+                            </div>
+
+                            <div class="card">
+                                <h3>Etapa 2: Orientações e Plano de Cuidado</h3>
+                                <p><strong>Indicação Principal:</strong> Esquema de primeira linha para o tratamento de todas as formas de hanseníase (Paucibacilar e Multibacilar) em adultos e crianças.</p>
+                                
+                                <h3>Modo de Uso</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="table">
+                                        <thead>
+                                            <tr><th>Paciente</th><th>Dose Supervisionada (1x/mês)</th><th>Dose Autoadministrada (diária)</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>Adulto</td><td>2 cápsulas de Rifampicina 300mg, 1 comprimido de Dapsona 100mg, 3 cápsulas de Clofazimina (total 200mg)</td><td>1 comprimido de Dapsona 100mg, 1 cápsula de Clofazimina 50mg</td></tr>
+                                            <tr><td>Criança (30-50kg)</td><td>1 cápsula de Rifampicina 300mg, 1 comprimido de Dapsona 50mg, 2 cápsulas de Clofazimina (total 100mg)</td><td>1 comprimido de Dapsona 50mg, 1 cápsula de Clofazimina 50mg (dias alternados)</td></tr>
+                                            <tr><td>Criança (&lt;30kg)</td><td>Ajuste de dose conforme peso</td><td>Ajuste de dose conforme peso</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p><strong>Recomendações:</strong> Tomar os medicamentos com água, durante ou após as refeições para minimizar desconforto gástrico. Evitar o consumo de álcool. A dose supervisionada é crucial e deve ser administrada na unidade de saúde.</p>
+                                
+                                <h3>Segurança</h3>
+                                <p><strong>Contraindicações:</strong> Hipersensibilidade a qualquer um dos componentes. Reações alérgicas graves à sulfa são uma contraindicação importante para a dapsona.</p>
+                                <p><strong>Reações Adversas Comuns:</strong> A rifampicina pode causar uma coloração avermelhada na urina, suor e lágrimas. A clofazimina causa hiperpigmentação da pele (cor marrom-avermelhada), que é reversível após o término do tratamento. Náuseas, vômitos e dor abdominal também são comuns.</p>
+                                <p><strong>Interações Medicamentosas:</strong> A rifampicina é um potente indutor enzimático, podendo reduzir a eficácia de anticoncepcionais orais, anticoagulantes e outros medicamentos. É fundamental orientar sobre a necessidade de métodos contraceptivos de barreira.</p>
+                            </div>
+
+                            <div class="card">
+                                <h3>Etapa 3: Pós-Dispensação</h3>
+                                <p><strong>Acompanhamento:</strong> O farmacêutico deve agendar o retorno mensal para a dose supervisionada, monitorar a adesão ao tratamento e avaliar o surgimento de reações adversas ou estados reacionais. O uso da Caderneta de Saúde do Paciente com Hanseníase deve ser incentivado para registro e acompanhamento.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="clofazimina">
+                        <h2>Clofazimina Isolada</h2>
+                        <div class="space-y-6">
+                            <div class="card">
+                                <h3>Apresentações Disponíveis</h3>
+                                <ul class="list-disc list-inside">
+                                    <li>Comprimido/Cápsula 50mg</li>
+                                    <li>Comprimido/Cápsula 100mg</li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h3>Orientações de Uso</h3>
+                                <p><strong>Indicações:</strong> Além de compor a PQT-U, a clofazimina é usada isoladamente ou em combinação para tratar estados reacionais, como a Reação Tipo 2 (Eritema Nodoso Hansênico), e em esquemas alternativos para pacientes que não podem usar a PQT-U padrão.</p>
+                                <p><strong>Modo de Uso:</strong> Sempre tomar após as refeições para melhorar a absorção e reduzir a intolerância gastrointestinal. Evitar o consumo de álcool e suco de laranja, que podem interferir no medicamento.</p>
+                                <p><strong>Segurança e Reações Adversas:</strong> A principal reação é a hiperpigmentação da pele e mucosas, que pode levar à depressão. É crucial informar ao paciente que essa alteração é temporária e desaparece gradualmente após o fim do tratamento. Também pode causar ressecamento da pele (ictiose) e dor abdominal. Cautela em pacientes com histórico de depressão.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="esquemas-alternativos">
+                        <h2>Esquemas Alternativos e de 2ª Linha</h2>
+                        <div class="card">
+                            <p>Para pacientes que apresentam reações adversas graves à PQT-U ou em casos de resistência, o Ministério da Saúde prevê esquemas alternativos. Estes geralmente envolvem a substituição de um dos fármacos do esquema padrão.</p>
+                            <ul class="list-disc list-inside mt-4 space-y-2">
+                                <li><strong>Minociclina:</strong> Usada em substituição à dapsona.</li>
+                                <li><strong>Ofloxacino e Claritromicina:</strong> Podem ser usados em combinação com a minociclina em esquemas alternativos.</li>
+                            </ul>
+                            <p class="mt-4">A dispensação desses esquemas exige prescrição médica detalhada e um acompanhamento farmacêutico ainda mais rigoroso, devido à menor familiaridade dos pacientes e profissionais com essas combinações.</p>
+                        </div>
+                    </section>
+                    
+                    <section id="reacoes-hansenicas">
+                        <h2>Manejo de Reações Hansênicas e Complicações</h2>
+                        <div class="card">
+                            <p>As reações hansênicas são exacerbações inflamatórias que podem ocorrer antes, durante ou após o tratamento. O manejo adequado é essencial para prevenir incapacidades.</p>
+                            <h3 class="mt-4">Medicamentos Utilizados</h3>
+                            <ul class="list-disc list-inside mt-4 space-y-4">
+                                <li><strong>Talidomida:</strong>
+                                    <p class="ml-4">Principal medicamento para a Reação Tipo 2 (Eritema Nodoso Hansênico). É um fármaco teratogênico (causa malformações graves no feto), e sua dispensação segue regras extremamente rigorosas da ANVISA, exigindo Termo de Consentimento, prescrição especial e controle absoluto do farmacêutico.</p>
+                                </li>
+                                <li><strong>Prednisona:</strong>
+                                    <p class="ml-4">Corticosteroide usado para tratar a Reação Tipo 1 (Reação Reversa) e neurites. O tratamento deve ser iniciado com doses mais altas e reduzido gradualmente. O farmacêutico deve orientar sobre os riscos do uso prolongado, como aumento da glicemia e da pressão arterial.</p>
+                                </li>
+                                <li><strong>Pentoxifilina:</strong>
+                                    <p class="ml-4">Pode ser usada como alternativa ou adjuvante no tratamento de reações, especialmente quando há contraindicação ao uso de corticoides.</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section id="referencias">
+                        <h2>Referências</h2>
+                        <ul class="list-decimal list-inside text-sm space-y-2">
+                           <li>Brasil. Ministério da Saúde. Secretaria de Ciência, Tecnologia, Inovação e Insumos Estratégicos em Saúde. Relação Nacional de Medicamentos Essenciais: Rename 2022. Brasília, DF: Ministério da Saúde, 2022.</li>
+                           <li>Brasil. Ministério da Saúde. Secretaria de Vigilância em Saúde. Departamento de Articulação Estratégica de Vigilância em Saúde. Guia de Bolso: Manejo de reações hansênicas e eventos adversos aos medicamentos. Brasília, DF: Ministério da Saúde, 2022.</li>
+                           <li>Brasil. Ministério da Saúde. Secretaria de Vigilância em Saúde. Departamento de Doenças de Condições Crônicas e Infecções Sexualmente Transmissíveis. Protocolo Clínico e Diretrizes Terapêuticas da Hanseníase. Brasília, DF: Ministério da Saúde, 2022.</li>
+                           <li>Distrito Federal. Secretaria de Estado de Saúde. Relação de Medicamentos Essenciais do Distrito Federal (REME-DF). Atualização 2024. Brasília, DF: SES/DF, 2024.</li>
+                           <li>Distrito Federal. Secretaria de Estado de Saúde. Protocolo de Atendimento a Pacientes Portadores de Hanseníase do Distrito Federal. Brasília, DF: SES/DF, 2019.</li>
+                        </ul>
+                    </section>
+                </div>
+
+                <div id="content-fake" class="disease-content hidden">
+                    <section id="fake-intro">
+                        <h2>Introdução à Doença Fictícia</h2>
+                        <p>Este é um espaço reservado para demonstrar como o layout pode ser adaptado para outras doenças ou roteiros no futuro. O conteúdo aqui é apenas um exemplo.</p>
+                    </section>
+                    <section id="fake-tratamento">
+                        <h2>Tratamento da Doença Fictícia</h2>
+                        <p>O tratamento para esta condição fictícia envolveria o uso do fármaco "Exemplomicina", administrado em conjunto com o "Placebonol". As orientações seriam detalhadas aqui, seguindo a mesma estrutura de avaliação, plano de cuidado e acompanhamento.</p>
+                    </section>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-6 text-center">
+            <p class="font-bold">© 2025 Nélio Gomes | Tese de Doutorado</p>
+            <p class="text-sm opacity-80 mt-2">Programa de Pós-Graduação em Ciências Farmacêuticas, Universidade de Brasília (UnB)</p>
+             <p class="text-xs opacity-60 mt-4">Citação sugerida: GOMES, N. Título da Tese. Tese (Doutorado em Ciências Farmacêuticas) - Universidade de Brasília, Brasília, 2025.</p>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='tese.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste JavaScript</title>
+</head>
+<body>
+    <h1>Teste JavaScript</h1>
+    <div id="test-result"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.innerHTML = '<p>JavaScript está funcionando!</p>';
+            
+            // Teste da API
+            fetch('/api/health')
+                .then(response => response.json())
+                .then(data => {
+                    resultDiv.innerHTML += '<p>API Health: ' + JSON.stringify(data) + '</p>';
+                })
+                .catch(error => {
+                    resultDiv.innerHTML += '<p>Erro na API: ' + error.message + '</p>';
+                });
+        });
+    </script>
+</body>
+</html> 

@@ -9,7 +9,7 @@ import uuid
 import time
 import logging
 import os
-from typing import List, Dict, Any
+from typing import Dict, Any
 from datetime import datetime
 import sys
 

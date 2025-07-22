@@ -1,0 +1,61 @@
+name: Deploy to Render
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Test application
+      run: |
+        python -c "import functions.api; print('API import successful')"
+        
+    - name: Create deployment package
+      run: |
+        mkdir -p deploy_package
+        cp functions/api.py deploy_package/
+        cp requirements.txt deploy_package/
+        cp runtime.txt deploy_package/
+        cp gunicorn.conf.py deploy_package/
+        cp render.yaml deploy_package/
+        cp -r templates deploy_package/
+        cp -r static deploy_package/
+        cp -r PDFs deploy_package/
+        cp -r functions deploy_package/
+        
+    - name: Create ZIP file
+      run: |
+        cd deploy_package
+        zip -r ../deploy_render.zip .
+        
+    - name: Upload deployment package
+      uses: actions/upload-artifact@v4
+      with:
+        name: render-deployment
+        path: deploy_render.zip
+        
+    - name: Deploy to Render (Manual Trigger)
+      run: |
+        echo "Deployment package created successfully!"
+        echo "To deploy to Render:"
+        echo "1. Go to https://dashboard.render.com"
+        echo "2. Create new Web Service"
+        echo "3. Upload deploy_render.zip or connect GitHub repository"
+        echo "4. Configure with render.yaml settings" 

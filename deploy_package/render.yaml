@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: roteiro-dispersacao
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app_optimized:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: PORT
+        value: 10000
+    healthCheckPath: /api/health
+    autoDeploy: true 

@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: roteiro-dispersacao
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app_production:app"
+    runtime: python

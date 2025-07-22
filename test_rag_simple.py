@@ -4,8 +4,6 @@ Teste simples do sistema RAG sem dependências complexas
 """
 
 import os
-import sys
-import json
 from pathlib import Path
 
 # Simula o sistema RAG básico

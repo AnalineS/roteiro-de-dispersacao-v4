@@ -4,9 +4,7 @@ Serviço RAG (Retrieval-Augmented Generation) para recuperação de contexto usa
 
 import os
 import logging
-import json
-from typing import List, Optional, Dict, Any
-import numpy as np
+from typing import List
 from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
@@ -132,7 +130,7 @@ class RAGService:
                 batch = documents_to_insert[i:i + batch_size]
                 
                 try:
-                    result = self.collection.insert_many(batch)
+                    self.collection.insert_many(batch)
                     logger.info(f"Lote {i//batch_size + 1} inserido: {len(batch)} documentos")
                 except Exception as e:
                     logger.error(f"Erro ao inserir lote {i//batch_size + 1}: {str(e)}")
@@ -235,7 +233,7 @@ class RAGService:
                 return False
             
             # Remove todos os documentos
-            result = self.collection.delete_many({})
+            self.collection.delete_many({})
             logger.info("Coleção limpa com sucesso")
             return True
             
