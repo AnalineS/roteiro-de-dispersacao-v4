@@ -16,8 +16,8 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Inicializa Flask
-app = Flask(__name__)
+# Inicializa Flask com templates da pasta raiz
+app = Flask(__name__, template_folder='../templates', static_folder='../static')
 CORS(app)  # Permite CORS para integração com frontend
 
 # Configurações
