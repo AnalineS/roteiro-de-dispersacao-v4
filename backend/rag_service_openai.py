@@ -261,6 +261,13 @@ class RAGService:
         except Exception as e:
             logger.error(f"Erro ao resetar collection: {str(e)}")
             return False
+    
+    def is_ready(self) -> bool:
+        """Verifica se o serviço está pronto para uso"""
+        return (self.is_initialized and 
+                self.openai_client is not None and 
+                self.astra_client is not None and
+                self.collection is not None)
 
 
 # Função de conveniência para criar instância
