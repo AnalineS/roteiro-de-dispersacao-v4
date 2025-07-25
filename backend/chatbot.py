@@ -23,8 +23,8 @@ class ChatbotService:
             base_url="https://openrouter.ai/api/v1"
         )
         
-        # Modelo Kimie K2
-        self.model_name = "moonshot/moonshot-v1-8k"  # Kimie K2 Free
+        # Modelo Kimie K2 Free via OpenRouter
+        self.model_name = "moonshot/moonshot-v1-8k"
         
         logger.info("ChatbotService inicializado")
     
