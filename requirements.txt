@@ -1,4 +1,10 @@
-streamlit
+flask
+flask-cors
+openai
 astrapy
 sentence-transformers
+python-dotenv
+transformers
+torch
 requests
+streamlit
