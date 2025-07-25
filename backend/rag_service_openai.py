@@ -193,38 +193,57 @@ class RAGService:
             logger.error(f"Erro na busca: {str(e)}")
             return []
     
-    def get_context(self, query: str, max_context_length: int = 2000) -> str:
-        """Obtém contexto relevante para a query"""
+    def retrieve_context(self, query: str, top_k: int = 3) -> str:
+        """
+        Recupera contexto relevante para uma consulta usando busca de similaridade
+        
+        Args:
+            query: Pergunta do usuário
+            top_k: Número de documentos mais relevantes a retornar
+            
+        Returns:
+            String com contexto concatenado
+        """
         try:
-            results = self.search(query, top_k=5)
+            if not self.is_initialized:
+                return "Base de conhecimento não disponível no momento."
             
-            if not results:
-                return "Nenhum contexto relevante encontrado."
+            # Gera embedding da consulta
+            query_embeddings = self.get_embeddings([query])
             
-            # Combina resultados em contexto
-            context_parts = []
-            current_length = 0
+            if not query_embeddings:
+                logger.error("Falha ao gerar embedding da query")
+                return "Erro ao processar consulta."
             
+            query_vector = query_embeddings[0]
+            
+            # Busca no Astra DB
+            results = self.collection.find(
+                {},
+                vector=query_vector,
+                limit=top_k,
+                include_similarity=True
+            )
+            
+            # Extrai documentos relevantes
+            relevant_docs = []
             for result in results:
-                content = result['content']
-                if current_length + len(content) <= max_context_length:
-                    context_parts.append(content)
-                    current_length += len(content)
-                else:
-                    # Adiciona parte do conteúdo se couber
-                    remaining_space = max_context_length - current_length
-                    if remaining_space > 100:  # Mínimo de 100 chars
-                        context_parts.append(content[:remaining_space] + "...")
-                    break
+                content = result.get("content", "")
+                if content.strip():
+                    relevant_docs.append(content)
             
-            context = "\n\n".join(context_parts)
-            logger.info(f"Contexto gerado com {len(context)} caracteres")
+            if not relevant_docs:
+                return "Não encontrei informações específicas sobre sua pergunta na base de conhecimento."
             
+            # Concatena contexto
+            context = "\n\n".join(relevant_docs)
+            
+            logger.info(f"Recuperados {len(relevant_docs)} documentos relevantes do Astra DB")
             return context
             
         except Exception as e:
-            logger.error(f"Erro ao obter contexto: {str(e)}")
-            return "Erro ao recuperar contexto."
+            logger.error(f"Erro ao recuperar contexto: {str(e)}")
+            return "Erro ao acessar base de conhecimento."
     
     def reset_collection(self) -> bool:
         """Reseta a collection (remove todos os documentos)"""
