@@ -7,5 +7,3 @@ python-dotenv
 transformers
 torch
 requests
-logging
-datetime
